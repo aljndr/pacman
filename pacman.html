@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>PacMan</title>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="pacman.js"></script>
+        <script type="text/javascript" src="jquery.js"></script>
+        <script type="text/javascript">
+    
+
+            $(document).ready(function() {
+                var canvas = $("#pac_canvas");
+                var ctxt = canvas.get(0).getContext("2d");
+                var snd = document.getElementById("snd");
+                ctxt.fillRect(0,0,584,600);
+                var pacman = new PacMan(ctxt,290,445);
+                var blinky = new Ghost(ctxt,292,284,pacman,"red");
+                var inky = new Ghost(ctxt,268,284,pacman,"cyan");
+                var pinky = new Ghost(ctxt,292,284,pacman,"pink");
+                var clyde = new Ghost(ctxt,316,284,pacman,"orange"); 
+                pacman.snd = snd;
+
+                canvas.click(function(){
+
+                snd.src="pac_sounds/PacmanOpeningSong.mp3"; 
+                snd.play();
+                setTimeout(function(){
+
+                    snd.pause();snd.src="pac_sounds/PacmanSiren.mp3"; snd.play();
+                    var echo = setInterval(function(){snd.pause();snd.src="pac_sounds/PacmanSiren.mp3"; snd.play();},1790);
+                
+                pacman.goes =setInterval(function(){pacman.left();},300);
+
+                var game_check=setInterval(function(){
+                    blinky.draw();inky.draw();pinky.draw();clyde.draw();
+                    $("span#pts").text(pacman.score);
+                    if(pacman.superPac)
+                    {
+                        blinky.scared();pinky.scared();inky.scared();clyde.scared();
+                        pacman.superPac=false;
+                        setTimeout(function(){
+                           
+                            blinky.courage();pinky.courage();inky.courage();clyde.courage();
+                        },10000);
+                    }
+
+                        if(pacman.pacY==inky.gY&&pacman.pacX==inky.gX&&inki.blue)
+                            {   
+                                clearInterval(inky.goes);inky.jail(); pacman.score+=100;
+                                setTimeout(function()
+                                {
+                                        clearInterval(inky.goes);
+                                        inky.goes=setInterval(function(){inky.free();
+                                        },inky.interval)
+                                },5000);
+
+                            }
+                        if(pacman.pacY==pinky.gY&&pacman.pacX==pinky.gX&&pinky.blue)
+                            {
+                                clearInterval(pinky.goes);pinky.jail(); pacman.score+=100;
+                                setTimeout(function()
+                                {
+                                        clearInterval(pinky.goes);
+                                        pinky.goes=setInterval(function(){pinky.free();
+                                        },pinky.interval)
+                                },5000);
+                            }
+                        if(pacman.pacY==blinky.gY&&pacman.pacX==blinky.gX&&blinky.blue)
+                            {
+                                clearInterval(blinky.goes); blinky.jail(); pacman.score+=100;
+                                setTimeout(function()
+                                {
+                                        clearInterval(blinky.goes);
+                                        blinky.goes=setInterval(function(){blinky.free();
+                                        },blinky.interval)
+                                },5000);
+                            }
+                        if(pacman.pacY==clyde.gY&&pacman.pacX==clyde.gX&&clyde.blue)
+                            {
+                                clearInterval(clyde.goes); clyde.jail(); pacman.score+=100;
+                                setTimeout(function()
+                                {
+                                        clearInterval(clyde.goes);
+                                        clyde.goes=setInterval(function(){clyde.free();
+                                        },clyde.interval)
+                                },5000);
+                            }
+
+               
+
+
+                        if((pacman.pacY==inky.gY&&pacman.pacX==inky.gX)||(pacman.pacY==pinky.gY&&pacman.pacX==pinky.gX)||(pacman.pacY==blinky.gY&&pacman.pacX==blinky.gX)||(pacman.pacY==clyde.gY&&pacman.pacX==clyde.gX))
+                            {
+                            clearInterval(echo);
+                            snd.pause();
+                            snd.src="pac_sounds/PacmanDies.mp3";
+                            snd.play();
+                            setTimeout(function(){alert("Game Over");},1000);
+                            clearInterval(inky.goes);
+                            clearInterval(pinky.goes);
+                            clearInterval(blinky.goes);
+                            clearInterval(clyde.goes);
+                            clearInterval(pacman.goes);
+                            clearInterval(game_check);
+                            pacman.clear();
+                            canvas.keypress(function(){});
+                            canvas.click(function(){});
+                            }
+
+
+                    if(pacman.notDots())
+                    {
+                            clearInterval(echo);
+                            snd.pause();
+                            snd.src="pac_sounds/PacmanIntermission.mp3";
+                            snd.play();
+                            setTimeout(function(){alert("Has ganado");},1000);
+                            clearInterval(inky.goes);
+                            clearInterval(pinky.goes);
+                            clearInterval(blinky.goes);
+                            clearInterval(clyde.goes);
+                            clearInterval(pacman.goes);
+                            clearInterval(game_check);
+                            pacman.clear();
+                            canvas.keypress(function(){});
+                            canvas.click(function(){});
+                    }
+
+
+                },1);
+
+                pinky.goes = setInterval(function(){pinky.jail();},3*pinky.interval);
+                inky.goes = setInterval(function(){inky.jail();},4*inky.interval);
+                clyde.goes = setInterval(function(){clyde.jail();},5*clyde.interval);
+
+                
+                setTimeout(function(){
+                    clearInterval(blinky.goes);
+                    blinky.goes=setInterval(function(){blinky.free();},blinky.interval)
+                },1);
+
+                setTimeout(function(){
+                    clearInterval(pinky.goes);
+                    pinky.goes=setInterval(function(){pinky.free();},pinky.interval)
+                },8000);
+
+                setTimeout(function(){
+                    clearInterval(inky.goes);
+                    inky.goes=setInterval(function(){inky.free();},inky.interval)
+                },12000);
+
+                setTimeout(function(){
+                    clearInterval(clyde.goes);
+                    clyde.goes=setInterval(function(){clyde.free();},clyde.interval)
+                },15000); },4500);
+                });//click_listener
+
+                canvas.attr("tabindex", "0").mousedown(function(){ $(this).focus(); return false; }).keypress(function(ev)
+                {   var interval = 300;
+                    switch(ev.which)
+                    {
+                        case 97:
+                             clearInterval(pacman.goes);
+                             pacman.goes =setInterval(function(){pacman.left();},interval);
+                            break;
+                        case 119:
+                            clearInterval(pacman.goes);
+                            pacman.goes =setInterval(function(){pacman.up();},interval);
+                            break;
+                        case 100:
+                            clearInterval(pacman.goes);
+                            pacman.goes =setInterval(function(){pacman.right();},interval);
+                            break;
+                        case 115:
+                            clearInterval(pacman.goes);
+                            pacman.goes =setInterval(function(){pacman.down();},interval);
+                            break;
+                    }
+                    return false;
+                });
+       
+                
+                 
+    
+    
+            });
+        </script>
+    </head>
+    <body style="background-color:#4D484B;">
+        <canvas id="pac_canvas" width=584 height=600 style="float:left;" ></canvas>
+        <audio id="snd" ></audio>
+        <audio id="snd_echo" ></audio>
+        <div id="texto" style=" float:left; margin-left:20px;" >
+            <h1 style="color:#F714A8; " >Intrucciones</h1>
+            <span style="color:#FFF; font-size:18px;" >Para iniciar dar click sobre el laberinto.<br>Controles:<br>
+                <ul>
+                    <li>Arriba:w</li>
+                    <li>Abajo:s</li>
+                    <li>Izquierda : a</li>
+                    <li>Derecha : d</li>
+                </ul>
+            </span><br>
+            <span style="color:#F714A8; font-size:70px;" >Score:</span>
+            <span id="pts" style="color:#FFF; font-size:70px;" >0</span>
+        </div>
+    </body>
+</html>
